@@ -1,26 +1,88 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {
+  EuiGlobalToastList,
+  EuiProvider,
+  EuiThemeProvider,
+} from "@elastic/eui";
+import { EuiThemeColorMode } from "@elastic/eui/src/services/theme";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { Route, Routes } from "react-router-dom";
+import { useAppSelector } from "./app/hooks";
+import { setToasts } from "./app/slices/MeetingSlice";
+import ThemeSelector from "./components/ThemeSelector";
+import CreateMeeting from "./pages/CreateMeeting";
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import OneOnOneMeeting from "./pages/OneOnOneMeeting";
+import VideoConference from "./pages/VideoConference";
+import Signup from "./pages/Signup";
+import MyMeetings from "./pages/MyMeetings";
+import Meeting from "./pages/Meeting";
+import JoinMeeting from "./pages/JoinMeeting";
 
-function App() {
+
+export default function App() {
+
+  const dispatch = useDispatch();
+  const isDarkTheme = useAppSelector((zoomApp) => zoomApp.auth.isDarkTheme);
+  const [isInitialEffect, setIsInitialEffect] = useState(true);
+  const toasts = useAppSelector((zoom) => zoom.meetings.toasts);
+
+  const removeToast = (removedToast: { id: string }) => {
+    dispatch(
+      setToasts(
+        toasts.filter((toast: { id: string }) => toast.id !== removedToast.id)
+      )
+    );
+  };
+  const [theme, setTheme] = useState<EuiThemeColorMode>("light");
+  useEffect(() => {
+    const theme = localStorage.getItem("remotel-theme");
+    if (theme) {
+      setTheme(theme as EuiThemeColorMode);
+    } else {
+      localStorage.setItem("remotel-theme", "light");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isInitialEffect) setIsInitialEffect(false);
+    else {
+      window.location.reload();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDarkTheme]);
+
+  const overrides = {
+    colors: {
+      LIGHT: { primary: "#FF6000" },
+      DARK: { primary: "#FF6000" },
+    },
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeSelector>
+      <EuiProvider colorMode={theme}>
+        <EuiThemeProvider modify={overrides}>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/create" element={<CreateMeeting />} />
+            <Route path="/create1on1" element={<OneOnOneMeeting />} />
+            <Route path="/createvideoconference" element={<VideoConference />} />
+            <Route path="/mymeetings" element={<MyMeetings />} />
+            <Route path="/meetings" element={<Meeting />} />
+            <Route path="/join/:id" element={<JoinMeeting />} />
+            <Route path="/" element={<Dashboard />} />
+            <Route path="*" element={<Login />} />
+          </Routes>
+          <EuiGlobalToastList
+            toasts={toasts}
+            dismissToast={removeToast}
+            toastLifeTimeMs={4000}
+          />
+        </EuiThemeProvider>
+      </EuiProvider>
+    </ThemeSelector>
   );
 }
-
-export default App;
