@@ -101,7 +101,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Support
 
-For any questions or issues, please reach out to our team at [support@remotelrtc.com](mailto:support@remotelrtc.com). We're here to help you make the most of your remote communication experience with Remotel-RTC.
+For any questions or issues, please reach out to our team at [support@remotelrtc.com](mailto:info@techllective.com). We're here to help you make the most of your remote communication experience with Remotel-RTC.
 
 ---
 
